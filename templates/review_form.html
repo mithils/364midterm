@@ -1,0 +1,34 @@
+
+{#{% extends 'base.html' %}#}
+
+
+{% block content %}
+
+<form method="POST">
+    {{ form.reviewer.label() }}{{ form.reviewer() }}<br>
+    {{ form.restaurant_name.label() }}{{ form.restaurant_name() }}<br>
+    {{ form.restaurant_type.label() }}{{ form.restaurant_type() }}<br>
+    {{ form.price.label() }}{{ form.price() }}<br>
+    {{ form.location.label() }}{{ form.location() }}<br>
+    {{ form.rating.label() }}{{ form.rating() }}<br>
+    {{ form.comments.label() }}{{ form.comments() }}<br>
+
+    {{ form.submit() }}
+    {{ form.hidden_tag() }}
+</form>
+{% for message in get_flashed_messages() %}
+    <strong>{{ message }}</strong>
+{% endfor %}
+
+{% endblock %}
+
+
+<h3>Navigation</h3>
+<ul>
+    <li><a href="{{ url_for('find_restaurant')}}">Search for a Restaurant</a></li>
+    <li><a href="{{ url_for('enter_review')}}">Enter a Restaurant Review</a></li>
+    <li><a href="{{ url_for('all_restaurants')}}">View all Restaurants</a></li>
+    <li><a href="{{ url_for('all_reviews')}}">View all Reviews</a></li>
+    <li><a href="{{ url_for('all_names')}}">View all Users</a></li>
+    <li><a href="{{ url_for('all_reviewers')}}">View all Reviewers</a></li>
+</ul>

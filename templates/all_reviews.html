@@ -1,0 +1,12 @@
+{% block content %}
+<ul>
+{% for nm in reviews %}
+  <li>{{ nm.review }} -- <i>{{ nm.rating }}</i></li><br>
+{% endfor %}
+</ul>
+
+{% if not users %}
+    There are no users to show.
+{% endif %}
+
+{% endblock %}

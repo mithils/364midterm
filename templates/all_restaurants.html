@@ -1,0 +1,12 @@
+{% block content %}
+<ul>
+{% for nm in restaurants %}
+  <li>{{ nm.name }} -- <i>{{ nm.food_type }}</i></li><br>
+{% endfor %}
+</ul>
+
+{% if not users %}
+    There are no users to show.
+{% endif %}
+
+{% endblock %}

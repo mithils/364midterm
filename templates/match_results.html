@@ -1,0 +1,32 @@
+{#{% extends 'base.html' %}#}
+
+<h1>Top Matches</h1>
+
+
+
+<table>
+    <TR>
+        <th>Restaurant Name</th>
+        <th>Price</th>
+        <th>Rating</th>
+    </TR>
+{% for item in data %}
+    <TR>
+
+       <TD >{{item.name}}</TD>
+       <TD >{{item.price}}</TD>
+       <TD >{{item.rating}}</TD>
+    </TR>
+{% endfor %}
+
+</table>
+
+<h3>Navigation</h3>
+<ul>
+    <li><a href="{{ url_for('find_restaurant')}}">Search for a Restaurant</a></li>
+    <li><a href="{{ url_for('enter_review')}}">Enter a Restaurant Review</a></li>
+    <li><a href="{{ url_for('all_restaurants')}}">View all Restaurants</a></li>
+    <li><a href="{{ url_for('all_reviews')}}">View all Reviews</a></li>
+    <li><a href="{{ url_for('all_names')}}">View all Users</a></li>
+    <li><a href="{{ url_for('all_reviewers')}}">View all Reviewers</a></li>
+</ul>

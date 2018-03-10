@@ -1,0 +1,24 @@
+{#{% extends 'base.html' %}#}
+<h3>Navigation</h3>
+<ul>
+    <li><a href="{{ url_for('find_restaurant')}}">Search for a Restaurant</a></li>
+    <li><a href="{{ url_for('enter_review')}}">Enter a Restaurant Review</a></li>
+    <li><a href="{{ url_for('all_restaurants')}}">View all Restaurants</a></li>
+    <li><a href="{{ url_for('all_reviews')}}">View all Reviews</a></li>
+    <li><a href="{{ url_for('all_names')}}">View all Users</a></li>
+    <li><a href="{{ url_for('all_reviewers')}}">View all Reviewers</a></li>
+</ul>
+
+
+{% block content %}
+<ul>
+{% for nm in names %}
+  <li>{{ nm.name }} -- <i>{{ nm.location }}</i></li><br>
+{% endfor %}
+</ul>
+
+{% if not users %}
+    There are no users to show.
+{% endif %}
+
+{% endblock %}

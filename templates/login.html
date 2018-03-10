@@ -1,0 +1,19 @@
+
+{#{% extends 'base.html' %}#}
+
+<h2>Restaurant Application</h2>
+<h4> Fill out the form below to find restaurants near you!</h4>
+
+{% block content %}
+
+<form action="http://localhost:5000/welcome" method="GET">
+    {{ form.name.label() }}{{ form.name() }}<br>
+    {{ form.location.label() }}{{ form.location() }}<br>
+    {{ form.submit() }}
+    {{ form.hidden_tag() }}
+</form>
+
+
+{% endblock %}
+
+
