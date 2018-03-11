@@ -97,10 +97,17 @@ class Review(db.Model):
 ###### FORMS ######
 ###################
 
+
+
 class NameForm(FlaskForm):
     name = StringField("Please enter your name:",validators=[Required()])
     location = StringField("Please enter current location(city):",validators=[Required()])
     submit = SubmitField("Submit")
+
+    def validate_city(self, field):
+        print (field)
+        if str(field.data).isalpha() == False:
+            raise ValidationError('Please enter a valid city!')
 
 class ReviewForm(FlaskForm):
     reviewer = StringField("Please enter your name:",validators=[Required()])
@@ -112,8 +119,12 @@ class ReviewForm(FlaskForm):
     comments = StringField("Please enter your comments:", validators=[Required()])
     submit = SubmitField("Submit")
 
+
+
+
+
 class FinderForm(FlaskForm):  # use with post request to same page
-    location = IntegerField('Pkease enter your zipcode:',validators=[Required()])
+    location = IntegerField('Please enter your zipcode:',validators=[Required()])
     #location =custom validator for zipcode
     price = IntegerField("Please enter price($,$$,$$$):",validators=[Required()])
     type = StringField("Type of food wanted:",validators=[Required()])
@@ -121,9 +132,14 @@ class FinderForm(FlaskForm):  # use with post request to same page
     submit = SubmitField("Submit")
 
 
+
 #######################
 ###### VIEW FXNS ######
 #######################
+
+@app.errorhandler(404)
+def page_na():
+    return render_template('404.html')
 
 @app.route('/home',methods=['GET','POST'])
 def home():
@@ -137,7 +153,8 @@ def login():
 
 @app.route('/welcome',methods=['GET','POST'])
 def welcome():
-    if request.args:
+    form = NameForm()
+    if request.args and form.validate_on_submit():
         result = request.args
         name = result.get('name')
         location = result.get('location')
@@ -167,7 +184,9 @@ def welcome():
             res['type'] = term['categories'][0]['title']
             search_list.append(res)
         return render_template('welcome.html',name=name,location=location,data=search_list)
-    return redirect(url_for('login'))
+    else:
+        flash('Please enter a valid city')
+        return redirect(url_for('login'))
 
 
 
