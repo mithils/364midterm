@@ -66,21 +66,6 @@ class Name(db.Model):
     def __repr__(self):
         return "{} (ID: {})".format(self.name, self.id)
 
-class Restaurant(db.Model):
-    __tablename__ = 'restaurants'
-    id = db.Column(db.Integer,primary_key=True)
-    name = db.Column(db.String(64))
-    price = db.Column(db.Integer)
-    zipcode = db.Column(db.String(5))
-    food_type = db.Column(db.String(64))
-    reviews = db.relationship('Review',backref='Restaurant')
-
-class User(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer,primary_key=True)
-    username = db.Column(db.String(64),unique=True)
-    reviews = db.relationship('Review',backref='User')
-
 class Review(db.Model):
     __tablename__ = 'reviews'
     id = db.Column(db.Integer,primary_key=True)
@@ -90,7 +75,24 @@ class Review(db.Model):
     price = db.Column(db.Integer)
     user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
-    # add db.relationship()'s for tables
+class Restaurant(db.Model):
+    __tablename__ = 'restaurants'
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(64))
+    price = db.Column(db.Integer)
+    zipcode = db.Column(db.String(5))
+    food_type = db.Column(db.String(64))
+    #rating = db.Column(db.Integer)
+    reviews = db.relationship('Review',backref='Restaurant')
+
+class User(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.Integer,primary_key=True)
+    username = db.Column(db.String(64))
+    reviews = db.relationship('Review',backref='User')
+
+
+
 
 
 ###################
@@ -98,22 +100,22 @@ class Review(db.Model):
 ###################
 
 
+def validate_price(form,field):
+    if str(field.data).isdigit() is False:
+        raise ValidationError('Please enter a valid price!')
+
 
 class NameForm(FlaskForm):
     name = StringField("Please enter your name:",validators=[Required()])
     location = StringField("Please enter current location(city):",validators=[Required()])
     submit = SubmitField("Submit")
 
-    def validate_city(self, field):
-        print (field)
-        if str(field.data).isalpha() == False:
-            raise ValidationError('Please enter a valid city!')
 
 class ReviewForm(FlaskForm):
     reviewer = StringField("Please enter your name:",validators=[Required()])
     restaurant_name = StringField("Please enter restaurant name:",validators=[Required()])
     restaurant_type = StringField("Please enter restaurant type:",validators=[Required()])
-    price = IntegerField("Please enter price($,$$,$$$):",validators=[Required()])
+    price = IntegerField("Please enter price($,$$,$$$):",validators=[Required(),validate_price])
     location = IntegerField("Please enter zipcode:",validators=[Required()])
     rating = IntegerField("Rate your restaurant:",validators=[Required()])
     comments = StringField("Please enter your comments:", validators=[Required()])
@@ -125,7 +127,6 @@ class ReviewForm(FlaskForm):
 
 class FinderForm(FlaskForm):  # use with post request to same page
     location = IntegerField('Please enter your zipcode:',validators=[Required()])
-    #location =custom validator for zipcode
     price = IntegerField("Please enter price($,$$,$$$):",validators=[Required()])
     type = StringField("Type of food wanted:",validators=[Required()])
 
@@ -153,8 +154,7 @@ def login():
 
 @app.route('/welcome',methods=['GET','POST'])
 def welcome():
-    form = NameForm()
-    if request.args and form.validate_on_submit():
+    if request.args:
         result = request.args
         name = result.get('name')
         location = result.get('location')
@@ -184,9 +184,12 @@ def welcome():
             res['type'] = term['categories'][0]['title']
             search_list.append(res)
         return render_template('welcome.html',name=name,location=location,data=search_list)
-    else:
-        flash('Please enter a valid city')
-        return redirect(url_for('login'))
+
+
+    return redirect(url_for('login'))
+    # else:
+    #     flash('Please enter a valid city')
+
 
 
 
@@ -194,6 +197,7 @@ def welcome():
 @app.route('/enter_review',methods=['GET','POST'])
 def enter_review():
     form = ReviewForm()
+
     if form.validate_on_submit():
         reviewer = form.reviewer.data # needed for User db column username
         res_name = form.restaurant_name.data
@@ -203,9 +207,11 @@ def enter_review():
         location = form.location.data
         comments = form.comments.data
 
-        user = User(username=reviewer)
-        db.session.add(user)
-        db.session.commit()
+        user = User.query.filter_by(username=reviewer).first()
+        print (user.id)
+        if not user:
+            db.session.add(user)
+            db.session.commit()
 
         restaurant = Restaurant(name=res_name,price=price,zipcode=location,food_type=res_type)
         db.session.add(restaurant)
