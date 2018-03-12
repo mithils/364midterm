@@ -335,7 +335,7 @@ def feeling_lucky_result():
 @app.route('/all_reviews')
 def all_reviews():
     reviews = Review.query.all()
-    #res = tuple((x, Restaurant.query.filter_by()))
+
     return render_template('all_reviews.html',reviews=reviews)
 
 @app.route('/all_restaurants')
@@ -352,6 +352,7 @@ def all_reviewers():
 @app.route('/all_names')
 def all_names():
     names = Name.query.all()
+    print (names)
 
     return render_template('all_names.html',names=names)
 
