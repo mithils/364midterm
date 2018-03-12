@@ -16,6 +16,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, ValidationError, IntegerField
 from wtforms.validators import Required, Length
 from flask_sqlalchemy import SQLAlchemy
+import random
 
 
 
@@ -37,7 +38,7 @@ SEARCH_LIMIT = 5
 
 ## All app.config values
 app.config['SECRET_KEY'] = 'hard to guess string from si364'
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost/midterm"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://localhost/midterm1"
 ## Provided:
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -82,7 +83,7 @@ class Restaurant(db.Model):
     price = db.Column(db.Integer)
     zipcode = db.Column(db.String(5))
     food_type = db.Column(db.String(64))
-    #rating = db.Column(db.Integer)
+    rating = db.Column(db.Integer)
     reviews = db.relationship('Review',backref='Restaurant')
 
 class User(db.Model):
@@ -100,22 +101,24 @@ class User(db.Model):
 ###################
 
 
+
 def validate_price(form,field):
     if str(field.data).isdigit() is False:
         raise ValidationError('Please enter a valid price!')
 
 
-class NameForm(FlaskForm):
+class UserForm(FlaskForm):
     name = StringField("Please enter your name:",validators=[Required()])
     location = StringField("Please enter current location(city):",validators=[Required()])
+    type = StringField("Favorite food type(Italian, Mexican etc.):",validators=[Required()])
     submit = SubmitField("Submit")
 
 
 class ReviewForm(FlaskForm):
     reviewer = StringField("Please enter your name:",validators=[Required()])
     restaurant_name = StringField("Please enter restaurant name:",validators=[Required()])
-    restaurant_type = StringField("Please enter restaurant type:",validators=[Required()])
-    price = IntegerField("Please enter price($,$$,$$$):",validators=[Required(),validate_price])
+    restaurant_type = StringField("Please enter restaurant type(Italian, Mexican etc.):",validators=[Required()])
+    price = IntegerField("Please enter price(1($),2($$),3($$$)):",validators=[Required(),validate_price])
     location = IntegerField("Please enter zipcode:",validators=[Required()])
     rating = IntegerField("Rate your restaurant:",validators=[Required()])
     comments = StringField("Please enter your comments:", validators=[Required()])
@@ -125,10 +128,10 @@ class ReviewForm(FlaskForm):
 
 
 
-class FinderForm(FlaskForm):  # use with post request to same page
+class FinderForm(FlaskForm):
     location = IntegerField('Please enter your zipcode:',validators=[Required()])
-    price = IntegerField("Please enter price($,$$,$$$):",validators=[Required()])
-    type = StringField("Type of food wanted:",validators=[Required()])
+    price = IntegerField("Please enter price(1($),2($$),3($$$)):",validators=[Required(),validate_price])
+    type = StringField("Type of food wanted(Italian, Mexican etc.):",validators=[Required()])
 
     submit = SubmitField("Submit")
 
@@ -139,17 +142,13 @@ class FinderForm(FlaskForm):  # use with post request to same page
 #######################
 
 @app.errorhandler(404)
-def page_na():
-    return render_template('404.html')
+def page_na(error):
+    return render_template('404.html',404)
 
-@app.route('/home',methods=['GET','POST'])
-def home():
-    #form = NameForm() # User should be able to enter name after name and each one will be saved, even if it's a duplicate! Sends data with GET
-    return render_template('base.html')
 
 @app.route('/login',methods=['GET','POST'])
 def login():
-    form = NameForm()
+    form = UserForm()
     return render_template('login.html',form=form)
 
 @app.route('/welcome',methods=['GET','POST'])
@@ -208,18 +207,20 @@ def enter_review():
         comments = form.comments.data
 
         user = User.query.filter_by(username=reviewer).first()
-        print (user.id)
         if not user:
-            db.session.add(user)
+            n_user = User(username=reviewer)
+            db.session.add(n_user)
             db.session.commit()
 
-        restaurant = Restaurant(name=res_name,price=price,zipcode=location,food_type=res_type)
+        restaurant = Restaurant(name=res_name, price=price, zipcode=location, food_type=res_type,rating=rating)
         db.session.add(restaurant)
         db.session.commit()
 
         review = Review(user_id=user.id,rating=rating,price=price,review=comments,restaurant_id = restaurant.id)
         db.session.add(review)
         db.session.commit()
+
+
         flash('Review Added!')
     errors = [v for v in form.errors.values()]
     if len(errors) > 0:
@@ -262,9 +263,79 @@ def restaurant_match():
     return redirect(url_for(find_restaurant))
 
 
+@app.route('/feeling_lucky', methods = ['GET', 'POST'])
+def feeling_lucky():
+    form = UserForm()
+    print (form.validate_on_submit())
+    if request.method == 'POST' and form.validate_on_submit():
+        name = form.name.data
+        location = form.name.data
+        res_type = form.type.data
+
+        params = {}
+        params['location'] = location
+        params['limit'] = SEARCH_LIMIT
+        params['sort_by'] = 'rating'
+        params['categories'] = res_type
+
+        url = API_HOST + SEARCH_PATH
+        resp = requests.get(url, params=params, headers=headers)
+
+        search_list = []
+        data = json.loads(resp.text)
+
+        for term in data['businesses']:
+            res = {}
+            res['name'] = term['name']
+
+            search_list.append(res)
+        random_selection = random.choice(search_list)
+        restaurant = random_selection['name']
+
+        return render_template('feeling_lucky.html',form=form,name=name,restaurant=restaurant)
+    flash ('All fields are required')
+    return render_template('feeling_lucky.html',form=form)
+
+
+@app.route('/feeling_lucky_result', methods = ['GET', 'POST'])
+def feeling_lucky_result():
+    form = UserForm()
+
+    if request.method == 'POST' and form.validate_on_submit():
+        name = form.name.data
+        location = form.name.data
+        res_type = form.type.data
+
+        params = {}
+        params['location'] = location
+        params['limit'] = SEARCH_LIMIT
+        params['sort_by'] = 'rating'
+        params['categories'] = res_type
+
+        url = API_HOST + SEARCH_PATH
+        resp = requests.get(url, params=params, headers=headers)
+
+        search_list = []
+        data = json.loads(resp.text)
+
+        for term in data['businesses']:
+            res = {}
+            res['name'] = term['name']
+
+            search_list.append(res)
+        random_selection = random.choice(search_list)
+        restaurant = random_selection['name']
+        print (restaurant)
+
+        return "Hi, {0}! The algorithm has chosen {1}. Enjoy!".format(name,restaurant)
+    flash ('All fields are required')
+    return redirect(url_for('login'))
+
+
 @app.route('/all_reviews')
 def all_reviews():
     reviews = Review.query.all()
+    #res = tuple((x, Restaurant.query.filter_by()))
     return render_template('all_reviews.html',reviews=reviews)
 
 @app.route('/all_restaurants')
