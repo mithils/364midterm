@@ -1,10 +1,13 @@
 
-{#{% extends 'base.html' %}#}
+{% extends 'base.html' %}
 
-<h2>Restaurant Application</h2>
-<h4> Fill out the form below to find restaurants near you!</h4>
+
+
 
 {% block content %}
+
+    <h2>Restaurant Application</h2>
+<h4> Fill out the form below to find restaurants near you!</h4>
 
 <form action="http://localhost:5000/welcome" method="GET">
     {{ form.name.label() }}{{ form.name() }}<br>

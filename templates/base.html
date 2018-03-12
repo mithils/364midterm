@@ -1,16 +1,31 @@
 
 
-{#<h4>Learn more about restaurants near you! Use the login link below:</h4>#}
-{##}
-{#<br>#}
-{#<li><a href="{{ url_for('login') }}">Login</a></li>#}
-
 <!doctype html>
 <html>
   <head>
-    <h1>Midterm Application</h1>
+    {% block head %}
+    <title>{% block title %}{% endblock %} - SI 364 Midterm Application</title>
+    {% endblock %}
   </head>
   <body>
-    <h2>Restaurant Application</h2>
+  <h3>Navigation</h3>
+<ul>
+    <li><a href="{{ url_for('find_restaurant')}}">Search for a Restaurant</a></li>
+    <li><a href="{{ url_for('enter_review')}}">Enter a Restaurant Review</a></li>
+    <li><a href="{{ url_for('feeling_lucky')}}">Feeling Lucky?</a></li>
+    <li><a href="{{ url_for('all_restaurants')}}">View all Restaurants</a></li>
+    <li><a href="{{ url_for('all_reviews')}}">View all Reviews</a></li>
+    <li><a href="{{ url_for('all_names')}}">View all Users</a></li>
+    <li><a href="{{ url_for('all_reviewers')}}">View all Reviewers</a></li>
+</ul>
+  <div id="content">
+      {% block content %}
+      {% endblock %}
+  </div>
+    <div id="footer">
+      {% block footer %}
+      &copy; Copyright 2018.
+      {% endblock %}
+    </div>
   </body>
 </html>

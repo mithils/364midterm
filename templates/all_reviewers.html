@@ -1,12 +1,26 @@
-{% block content %}
-<ul>
-{% for nm in reviewers %}
-  <li>{{ nm.username }} </li><br>
-{% endfor %}
-</ul>
+{% extends 'base.html' %}
 
-{% if not users %}
-    There are no users to show.
+
+{% block content %}
+
+<h3>All Reviewers</h3>
+   <table>
+    <TR>
+        <th>Reviewer</th>
+
+    </TR>
+{% for item in reviewers %}
+    <TR>
+
+       <TD >{{item.username}}</TD>
+
+    </TR>
+{% endfor %}
+
+</table>
+
+{% if not reviewers %}
+    There are no reviewers at the moment.
 {% endif %}
 
 {% endblock %}

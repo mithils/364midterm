@@ -5,10 +5,10 @@
 
 
 
-<form action="http://localhost:5000/match_results"  method="POST">
+<form action="http://localhost:5000/feeling_lucky"  method="POST">
+    {{ form.name.label() }}{{ form.name() }}<br>
     {{ form.location.label() }}{{ form.location() }}<br>
     {{ form.type.label() }}{{ form.type() }}<br>
-    {{ form.price.label() }}{{ form.price() }}<br>
     {{ form.submit() }}
 
 
@@ -19,6 +19,12 @@
 {% for message in get_flashed_messages() %}
     <strong>{{ message }}</strong>
 {% endfor %}
+
+{% if name %}
+    <h4>Hi, {{ name }}! The algorithm has chosen {{ restaurant }} for you to try.</h4>
+
+{% endif %}
+
 
 
 

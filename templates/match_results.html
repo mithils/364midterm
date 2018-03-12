@@ -1,4 +1,7 @@
-{#{% extends 'base.html' %}#}
+{% extends 'base.html' %}
+
+{% block content %}
+
 
 <h1>Top Matches</h1>
 
@@ -21,12 +24,6 @@
 
 </table>
 
-<h3>Navigation</h3>
-<ul>
-    <li><a href="{{ url_for('find_restaurant')}}">Search for a Restaurant</a></li>
-    <li><a href="{{ url_for('enter_review')}}">Enter a Restaurant Review</a></li>
-    <li><a href="{{ url_for('all_restaurants')}}">View all Restaurants</a></li>
-    <li><a href="{{ url_for('all_reviews')}}">View all Reviews</a></li>
-    <li><a href="{{ url_for('all_names')}}">View all Users</a></li>
-    <li><a href="{{ url_for('all_reviewers')}}">View all Reviewers</a></li>
-</ul>
+{% endblock %}
+
+

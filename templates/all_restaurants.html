@@ -1,12 +1,28 @@
-{% block content %}
-<ul>
-{% for nm in restaurants %}
-  <li>{{ nm.name }} -- <i>{{ nm.food_type }}</i></li><br>
-{% endfor %}
-</ul>
+{% extends 'base.html' %}
 
-{% if not users %}
-    There are no users to show.
-{% endif %}
+
+{% block content %}
+
+<h3>All Reviewed Restaurants</h3>
+   <table>
+    <TR>
+        <th>Restaurant Name</th>
+        <th>Price</th>
+        <th>Rating</th>
+    </TR>
+{% for item in restaurants %}
+    <TR>
+
+       <TD >{{item.name}}</TD>
+       <TD >{{item.food_type}}</TD>
+       <TD >{{item.rating}}</TD>
+        <TD >{{item.price}}</TD>
+    </TR>
+{% endfor %}
+
+</table>
+
+
+
 
 {% endblock %}

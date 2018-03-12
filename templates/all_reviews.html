@@ -1,12 +1,26 @@
-{% block content %}
-<ul>
-{% for nm in reviews %}
-  <li>{{ nm.review }} -- <i>{{ nm.rating }}</i></li><br>
-{% endfor %}
-</ul>
+{% extends 'base.html' %}
 
-{% if not users %}
-    There are no users to show.
-{% endif %}
+
+{% block content %}
+
+<h3>All Reviews</h3>
+   <table>
+    <TR>
+        <th>Review</th>
+        <th>Rating</th>
+        <th>Price</th>
+    </TR>
+{% for item in reviews %}
+    <TR>
+
+       <TD >{{item.review}}</TD>
+       <TD >{{item.rating}}</TD>
+       <TD >{{item.price}}</TD>
+    </TR>
+{% endfor %}
+
+</table>
+
+
 
 {% endblock %}
